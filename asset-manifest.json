@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/ChristianHirschey/Pipe-Band-Metronome/static/css/main.e19ee6d4.css",
+    "main.js": "/ChristianHirschey/Pipe-Band-Metronome/static/js/main.2525c039.js",
+    "index.html": "/ChristianHirschey/Pipe-Band-Metronome/index.html",
+    "main.e19ee6d4.css.map": "/ChristianHirschey/Pipe-Band-Metronome/static/css/main.e19ee6d4.css.map",
+    "main.2525c039.js.map": "/ChristianHirschey/Pipe-Band-Metronome/static/js/main.2525c039.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e19ee6d4.css",
+    "static/js/main.2525c039.js"
+  ]
+}
