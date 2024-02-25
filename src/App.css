@@ -1,5 +1,8 @@
 .App {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .App-logo {
@@ -24,8 +27,25 @@
   color: white;
 }
 
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 .App-link {
   color: #61dafb;
+}
+
+.Footer {
+  text-align: center;
+  margin-top: auto;
+}
+
+.Links {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
 }
 
 @keyframes App-logo-spin {
