@@ -1,15 +1,18 @@
 {
   "files": {
     "main.css": "/PipeBandMetronome/static/css/main.19139a41.css",
-    "main.js": "/PipeBandMetronome/static/js/main.4f12cbf1.js",
+    "main.js": "/PipeBandMetronome/static/js/main.ee8ac69f.js",
+    "static/js/885.75283fe5.chunk.js": "/PipeBandMetronome/static/js/885.75283fe5.chunk.js",
     "static/js/453.915404c4.chunk.js": "/PipeBandMetronome/static/js/453.915404c4.chunk.js",
+    "static/media/metronome.wav": "/PipeBandMetronome/static/media/metronome.5989437f8f703f35b212.wav",
     "index.html": "/PipeBandMetronome/index.html",
     "main.19139a41.css.map": "/PipeBandMetronome/static/css/main.19139a41.css.map",
-    "main.4f12cbf1.js.map": "/PipeBandMetronome/static/js/main.4f12cbf1.js.map",
+    "main.ee8ac69f.js.map": "/PipeBandMetronome/static/js/main.ee8ac69f.js.map",
+    "885.75283fe5.chunk.js.map": "/PipeBandMetronome/static/js/885.75283fe5.chunk.js.map",
     "453.915404c4.chunk.js.map": "/PipeBandMetronome/static/js/453.915404c4.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.19139a41.css",
-    "static/js/main.4f12cbf1.js"
+    "static/js/main.ee8ac69f.js"
   ]
 }
