@@ -12,8 +12,7 @@ const MetronomePlayer = ({ dropdowns }) => {
 
   return (
     <div>
-      {/* Render any necessary UI elements */}
-      <button onClick={handlePlaySound}>Play Sound</button>
+      <button onClick={handlePlaySound}>Play</button>
     </div>
   );
 }
