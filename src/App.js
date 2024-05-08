@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
-import playMetronome from './metronome';
+import MetronomePlayer from './MetronomePLayer';
 
 function App() {
   const [dropdowns, setDropdowns] = useState([{ id: 1, timeSignature: '2-4', bpm: null, parts: null }]);
@@ -20,15 +20,7 @@ function App() {
   };
 
   const handlePlayClick = () => {
-    // Collect all selected values from dropdowns state and pass them to the playMetronome function
-    dropdowns.forEach((dropdown) => {
-      if (dropdown.bpm && dropdown.parts && dropdown.timeSignature) {
-        playMetronome(dropdown.timeSignature, dropdown.bpm, dropdown.parts);
-      } else {
-        // Handle incomplete dropdowns (missing BPM, parts, or time signature) if needed
-        console.error('Incomplete dropdown settings:', dropdown);
-      }
-    });
+    MetronomePlayer.handlePlaySound();
   };
 
   return (
@@ -74,7 +66,8 @@ function App() {
           ))}
         </div>
         <button onClick={addDropdown}>Add Tune</button>
-        <button onClick={handlePlayClick}>Play</button>
+        <MetronomePlayer dropdowns={dropdowns} />
+        <br />
       </main>
       <div className="Footer">
         <footer>
