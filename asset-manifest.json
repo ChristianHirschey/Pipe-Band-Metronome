@@ -1,18 +1,18 @@
 {
   "files": {
-    "main.css": "/PipeBandMetronome/static/css/main.19139a41.css",
-    "main.js": "/PipeBandMetronome/static/js/main.2cb57d7c.js",
-    "static/js/885.75283fe5.chunk.js": "/PipeBandMetronome/static/js/885.75283fe5.chunk.js",
-    "static/js/453.915404c4.chunk.js": "/PipeBandMetronome/static/js/453.915404c4.chunk.js",
-    "static/media/metronome.wav": "/PipeBandMetronome/static/media/metronome.5989437f8f703f35b212.wav",
-    "index.html": "/PipeBandMetronome/index.html",
-    "main.19139a41.css.map": "/PipeBandMetronome/static/css/main.19139a41.css.map",
-    "main.2cb57d7c.js.map": "/PipeBandMetronome/static/js/main.2cb57d7c.js.map",
-    "885.75283fe5.chunk.js.map": "/PipeBandMetronome/static/js/885.75283fe5.chunk.js.map",
-    "453.915404c4.chunk.js.map": "/PipeBandMetronome/static/js/453.915404c4.chunk.js.map"
+    "main.css": "/Pipe-Band-Metronome/static/css/main.19139a41.css",
+    "main.js": "/Pipe-Band-Metronome/static/js/main.cf210597.js",
+    "static/js/885.75283fe5.chunk.js": "/Pipe-Band-Metronome/static/js/885.75283fe5.chunk.js",
+    "static/js/453.915404c4.chunk.js": "/Pipe-Band-Metronome/static/js/453.915404c4.chunk.js",
+    "static/media/metronome.wav": "/Pipe-Band-Metronome/static/media/metronome.5989437f8f703f35b212.wav",
+    "index.html": "/Pipe-Band-Metronome/index.html",
+    "main.19139a41.css.map": "/Pipe-Band-Metronome/static/css/main.19139a41.css.map",
+    "main.cf210597.js.map": "/Pipe-Band-Metronome/static/js/main.cf210597.js.map",
+    "885.75283fe5.chunk.js.map": "/Pipe-Band-Metronome/static/js/885.75283fe5.chunk.js.map",
+    "453.915404c4.chunk.js.map": "/Pipe-Band-Metronome/static/js/453.915404c4.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.19139a41.css",
-    "static/js/main.2cb57d7c.js"
+    "static/js/main.cf210597.js"
   ]
 }
