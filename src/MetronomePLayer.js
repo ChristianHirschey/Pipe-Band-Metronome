@@ -1,12 +1,11 @@
-// MetronomePlayer.js
 import React from 'react';
 import useMetronome from './metronome';
+import doRolls from './App';
 
 const MetronomePlayer = ({ dropdowns }) => {
-  const playMetronome = useMetronome(dropdowns);
+  const playMetronome = useMetronome(dropdowns, doRolls);
 
   const handlePlaySound = () => {
-    // Your sound playing logic here
     playMetronome();
   };
 

@@ -37,6 +37,32 @@ body {
   color: #61dafb;
 }
 
+.DropdownItem {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 1.75vw
+}
+
+.select {
+  font-size: 1.2vw;
+  height: 1.75vw;
+  box-sizing: border-box;
+}
+
+.text-box {
+  max-width: 10.5vw;
+  font-size: 1.2vw;
+  box-sizing: border-box;
+}
+
+.button {
+  font-size: 1.2vw;
+  height: 1.75vw;
+  box-sizing: border-box;
+}
+
 .Footer {
   text-align: center;
   margin-top: auto;
@@ -46,13 +72,4 @@ body {
   display: flex;
   justify-content: center;
   gap: 20px;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }
