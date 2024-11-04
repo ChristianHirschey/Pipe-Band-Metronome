@@ -1,0 +1,60 @@
+.Home {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+  
+.Home-header {
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+}
+  
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+  
+.DropdownItem {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    height: 1.75vw
+}
+  
+.select {
+    font-size: 1.2vw;
+    height: 1.75vw;
+    box-sizing: border-box;
+}
+  
+.text-box {
+    max-width: 10.5vw;
+    font-size: 1.2vw;
+    box-sizing: border-box;
+}
+  
+.button {
+    font-size: 1.2vw;
+    height: 1.75vw;
+    box-sizing: border-box;
+}
+  
+.Footer {
+    text-align: center;
+    margin-top: auto;
+}
+  
+.Links {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
