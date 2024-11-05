@@ -58,3 +58,15 @@ body {
     justify-content: center;
     gap: 20px;
 }
+
+.grid-box {
+    width: 20px;
+    height: 20px;
+    margin: 5px;
+    background-color: grey;
+    display: inline-block;
+}
+  
+.grid-box.active {
+    background-color: red;
+}
