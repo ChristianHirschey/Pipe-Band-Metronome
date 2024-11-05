@@ -63,7 +63,7 @@ const MetronomeLogic = ({ dropdowns, onBeatUpdate, onUpdateBeatsToDisplay }) => 
 
         for (let i = 0; i < len; i++) {
             play();
-            if(trans < 0) trans = beats - trans; // if transition is negative, update to be beats - trans
+            if(trans < 0) trans = beats + trans; // if transition is negative, update to be beats + the negative value trans or beats - trans
             if(display === beats) { // only update to transition if hasn't yet updated
                 onBeatUpdate(i % beats);
                 if(beats >= trans) display = beats < len - i ? beats : trans; // only update to trans if displaybeats is greater than trans
