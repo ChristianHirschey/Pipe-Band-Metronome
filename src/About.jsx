@@ -5,11 +5,13 @@ import './About.css'
 function About() {
     return (
         <div className='Home'>
-            <header>
-                <h1 className='Header'>About Page</h1>
-            </header>
-            <main>
-                <div className='about-paragraph'>
+            <div className='container'>
+              <header>
+                  <h1 className='Header'>Pipe Band Metronome</h1>
+              </header>
+              <main>
+                  <div className='card'>
+                    <div className='about-paragraph'>
                     <p>
                         Pipe Band Metronome is a metronome web app specifically designed for bagpipe competition sets,
                         most notably MSRs, Medleys, and Hornpipe/Jigs. These sets contain several tunes with varying tempi
@@ -28,12 +30,14 @@ function About() {
                         to transition beats and will be played accordingly. Other transitions can be tested simply by just having the 
                         specific tune types and 1 part set with varying transition inputs before setting up the whole medley and its transitions.
                     </p>
-                </div>
-            </main>
-            <div className='Footer'>
+                    </div>
+                  </div>
+              </main>
+              <div className='Footer'>
                 <footer>
-                    <Link to='/'>Home</Link>
+                    <Link to='/' className="btn ghost">Home</Link>
                 </footer>
+              </div>
             </div>
         </div>
     );

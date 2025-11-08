@@ -11,7 +11,9 @@ class Home extends Component {
       dropdowns: [{ id: 1, timeSignature: 'rolls', bpm: null, parts: 1, transition: 4 }],
       currentBeat: 0,
       beatsToDisplay: 0,
-      metronomeViewBeats: []
+      metronomeViewBeats: [],
+      startMetronome: false,
+      notice: null
     };
   }
 
@@ -38,8 +40,18 @@ class Home extends Component {
   }
 
   removeDropdown = (id) => {
-    const updatedDropdowns = this.state.dropdowns.filter((dropdown) => dropdown.id !== id);
-    this.setState({ dropdowns: updatedDropdowns });
+    // If metronome is running, kill playback first to avoid overlapping loops
+    if (this.state.startMetronome) {
+      this.setState({ startMetronome: false, notice: 'Playback stopped because a tune was removed.' }, () => {
+        const updatedDropdowns = this.state.dropdowns.filter((dropdown) => dropdown.id !== id);
+        this.setState({ dropdowns: updatedDropdowns });
+        // clear notice after a short delay
+        setTimeout(() => this.setState({ notice: null }), 2200);
+      });
+    } else {
+      const updatedDropdowns = this.state.dropdowns.filter((dropdown) => dropdown.id !== id);
+      this.setState({ dropdowns: updatedDropdowns });
+    }
   }
 
   handleDropdownChange = (id, field, value) => {
@@ -69,19 +81,23 @@ class Home extends Component {
   render() {
     return (
       <div className="Home">
-        <div className="Header">
-          <header>
-            <h1>Pipe Band Metronome</h1>
-          </header>
-        </div>
-        <main>
-          <div className="MetronomeView">
-            {this.renderGridBoxes()}
+        <div className="container">
+          <div className="Header">
+            <header>
+              <h1>Pipe Band Metronome</h1>
+            </header>
           </div>
-          <div className="Dropdowns">
+          <main className="main-area">
+            <div className="metronome-card card">
+              <div className="MetronomeView metronome-grid">
+                {this.renderGridBoxes()}
+              </div>
+            </div>
+            <div className="Dropdowns">
             {this.state.dropdowns.map((dropdown) => (
               <div key={dropdown.id} className="DropdownItem">
-                <select
+                <div className="card" style={{display:'flex', gap:12, alignItems:'center', justifyContent:'space-between'}}>
+                  <select
                   value={dropdown.timeSignature}
                   onChange={(e) => this.handleDropdownChange(dropdown.id, 'timeSignature', e.target.value)}
                   className='select'
@@ -104,45 +120,64 @@ class Home extends Component {
                     value={dropdown.bpm}
                     onChange={(e) => this.handleDropdownChange(dropdown.id, 'bpm', parseInt(e.target.value))}
                     placeholder="BPM"
-                    className='text-box'
+                    className='text-box form-input'
                   />
                   <input
                     type="number"
                     value={dropdown.parts}
                     onChange={(e) => this.handleDropdownChange(dropdown.id, 'parts', parseInt(e.target.value))}
                     placeholder="Number Parts"
-                    className='text-box'
+                    className='text-box form-input'
                   />
                   <input
                     type="number"
                     value={dropdown.transition}
                     onChange={(e) => this.handleDropdownChange(dropdown.id, 'transition', parseInt(e.target.value))}
                     placeholder="Transition Beats"
-                    className='text-box'
+                    className='text-box form-input'
                   />
                 </div>
-                <button className="button" onClick={() => this.removeDropdown(dropdown.id)}>Remove Tune</button>
+                <button className="btn danger" onClick={() => this.removeDropdown(dropdown.id)}>Remove Tune</button>
+                </div>
               </div>
             ))}
           </div>
-          <button onClick={this.addDropdown}>Add Tune</button>
-          <button onClick={() => this.setState({ startMetronome: true })}>Play</button>
+          <div style={{marginTop:12, display:'flex', gap:12, justifyContent:'center', alignItems:'center'}}>
+            <button className="btn ghost" onClick={this.addDropdown}>Add Tune</button>
+            <button
+              className="btn"
+              onClick={() => {
+                // Validate that each dropdown has required values before playing
+                const invalid = this.state.dropdowns.some(d => !d.bpm || !d.parts);
+                if (invalid) {
+                  this.setState({ notice: 'Please set BPM and Parts for each tune before playing.' });
+                  setTimeout(() => this.setState({ notice: null }), 2200);
+                  return;
+                }
+                // start playback; ensure any previous playback was stopped (MetronomeLogic will cancel on prop change)
+                this.setState({ startMetronome: true, notice: null });
+              }}
+            >Play</button>
+          </div>
+          {this.state.notice && (
+            <div style={{textAlign:'center', marginTop:12}} className="muted">{this.state.notice}</div>
+          )}
           {this.state.startMetronome && (
             <MetronomeLogic
               dropdowns={this.state.dropdowns}
               onBeatUpdate={this.setCurrentBeat}
               onUpdateBeatsToDisplay={this.updateBeatsToDisplay}
+              onStopped={() => this.setState({ startMetronome: false, notice: 'Playback finished.' })}
             />
           )}
         </main>
-        <div className="Footer">
-          <footer>
-            <div className="Links">
-              <Link to="/about">About</Link>
-              <a href="mailto:cjhirschey@crimson.ua.edu" target="_blank">Email</a>
-              <a href="https://github.com/ChristianHirschey" target="_blank">GitHub</a>
-            </div>
-          </footer>
+          <div className="Footer">
+            <footer>
+              <div className="Links">
+                <Link to="/about" className="btn ghost small">About</Link>
+              </div>
+            </footer>
+          </div>
         </div>
       </div>
     );

@@ -3,14 +3,9 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  padding-top: 12px;
 }
 
-body {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.App-link {
-  color: #61dafb;
+.App-link { 
+  color: var(--accent-2) 
 }
