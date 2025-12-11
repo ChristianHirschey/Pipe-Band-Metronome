@@ -100,6 +100,55 @@
     box-shadow: 0 8px 26px rgba(34,197,94,0.12); 
 }
 
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+    .DropdownItem {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        padding: 0;
+    }
+
+    .DropdownItem .card {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+        padding: 14px;
+    }
+
+    .select {
+        width: 100%;
+        min-width: unset;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+
+    .text-boxes {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .text-box {
+        width: 100%;
+        max-width: unset;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .grid-box {
+        width: 24px;
+        height: 24px;
+    }
+
+    .Footer {
+        padding-bottom: 20px;
+    }
+}
+
 @media (max-width: 760px) {
     .DropdownItem { 
         flex-direction: column; 

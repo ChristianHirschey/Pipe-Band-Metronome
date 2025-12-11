@@ -32,3 +32,17 @@
     text-align: center; 
     margin-top: auto; 
 }
+
+@media (max-width: 768px) {
+    .about-paragraph {
+        font-size: 1rem;
+        padding: 0 12px;
+        margin: 12px auto;
+        text-align: left;
+    }
+
+    .card {
+        padding: 16px;
+        margin: 12px;
+    }
+}
