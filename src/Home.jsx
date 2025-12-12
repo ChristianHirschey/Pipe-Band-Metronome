@@ -3,6 +3,7 @@ import MetronomeLogic from './MetronomeLogic';
 import './Home.css';
 import { Link } from 'react-router-dom';
 import calculateBeats from './calculateBeats';
+import RingerReminder from './RingerReminder';
 
 class Home extends Component {
   constructor(props) {
@@ -81,6 +82,7 @@ class Home extends Component {
   render() {
     return (
       <div className="Home">
+        <RingerReminder />
         <div className="container">
           <div className="Header">
             <header>
