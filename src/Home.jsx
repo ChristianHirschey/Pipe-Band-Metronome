@@ -40,6 +40,36 @@ class Home extends Component {
     }));
   }
 
+  loadMSR = () => {
+    this.setState({
+      dropdowns: [
+        { id: 1, timeSignature: 'rolls', bpm: null, parts: 1, transition: 4 },
+        { id: 2, timeSignature: '2-4', bpm: null, parts: null, transition: -1 },
+        { id: 3, timeSignature: '4str', bpm: null, parts: null, transition: 1 },
+        { id: 4, timeSignature: '2-2', bpm: null, parts: null, transition: 2 }
+      ],
+      startMetronome: false,
+      notice: 'MSR loaded: March, Strathspey, Reel'
+    });
+    setTimeout(() => this.setState({ notice: null }), 2200);
+  }
+
+  loadMedley = () => {
+    this.setState({
+      dropdowns: [
+        { id: 1, timeSignature: 'rolls', bpm: null, parts: 1, transition: 4 },
+        { id: 2, timeSignature: '2-4', bpm: null, parts: null, transition: -1 },
+        { id: 3, timeSignature: '6-8', bpm: null, parts: null, transition: 1 },
+        { id: 4, timeSignature: '4slow', bpm: null, parts: null, transition: 2 },
+        { id: 5, timeSignature: '4str', bpm: null, parts: null, transition: 1 },
+        { id: 6, timeSignature: '2-2', bpm: null, parts: null, transition: 2 }
+      ],
+      startMetronome: false,
+      notice: 'Medley loaded: Hornpipe, Jig, Slow Air, Strathspey, Reel'
+    });
+    setTimeout(() => this.setState({ notice: null }), 2200);
+  }
+
   removeDropdown = (id) => {
     // If metronome is running, kill playback first to avoid overlapping loops
     if (this.state.startMetronome) {
@@ -119,22 +149,31 @@ class Home extends Component {
                 <div className='text-boxes'>
                   <input
                     type="number"
-                    value={dropdown.bpm}
-                    onChange={(e) => this.handleDropdownChange(dropdown.id, 'bpm', parseInt(e.target.value))}
+                    value={dropdown.bpm || ''}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value);
+                      this.handleDropdownChange(dropdown.id, 'bpm', isNaN(val) ? null : val);
+                    }}
                     placeholder="BPM"
                     className='text-box form-input'
                   />
                   <input
                     type="number"
-                    value={dropdown.parts}
-                    onChange={(e) => this.handleDropdownChange(dropdown.id, 'parts', parseInt(e.target.value))}
+                    value={dropdown.parts || ''}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value);
+                      this.handleDropdownChange(dropdown.id, 'parts', isNaN(val) ? null : val);
+                    }}
                     placeholder="Number Parts"
                     className='text-box form-input'
                   />
                   <input
                     type="number"
-                    value={dropdown.transition}
-                    onChange={(e) => this.handleDropdownChange(dropdown.id, 'transition', parseInt(e.target.value))}
+                    value={dropdown.transition || ''}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value);
+                      this.handleDropdownChange(dropdown.id, 'transition', isNaN(val) ? null : val);
+                    }}
                     placeholder="Transition Beats"
                     className='text-box form-input'
                   />
@@ -150,7 +189,7 @@ class Home extends Component {
               className="btn"
               onClick={() => {
                 // Validate that each dropdown has required values before playing
-                const invalid = this.state.dropdowns.some(d => !d.bpm || !d.parts);
+                const invalid = this.state.dropdowns.some(d => !d.bpm || !d.parts || d.bpm <= 0 || d.parts <= 0);
                 if (invalid) {
                   this.setState({ notice: 'Please set BPM and Parts for each tune before playing.' });
                   setTimeout(() => this.setState({ notice: null }), 2200);
@@ -176,7 +215,9 @@ class Home extends Component {
           <div className="Footer">
             <footer>
               <div className="Links">
+                <button onClick={this.loadMSR} className="btn ghost small">MSR</button>
                 <Link to="/about" className="btn ghost small">About</Link>
+                <button onClick={this.loadMedley} className="btn ghost small">Medley</button>
               </div>
             </footer>
           </div>
