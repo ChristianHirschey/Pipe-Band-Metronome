@@ -26,7 +26,7 @@ function App() {
     return (
         <div className="App">
             <ThemeToggle theme={theme} toggle={toggleTheme} />
-            <Router basename="/Pipe-Band-Metronome">
+            <Router>
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/about" element={<About />} />
