@@ -2,7 +2,7 @@
   "name": "react-deploy",
   "version": "0.1.0",
   "private": false,
-  "homepage": "https://christianhirschey.github.io/Pipe-Band-Metronome/",
+  "homepage": "https://pipebandmetronome.com/",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
