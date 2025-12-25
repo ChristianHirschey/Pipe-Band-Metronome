@@ -9,7 +9,7 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      dropdowns: [{ id: 1, timeSignature: 'rolls', bpm: null, parts: 1, transition: 4 }],
+      dropdowns: [{ id: 1, timeSignature: 'rolls', bpm: null, parts: 1, preTransition: 0, postTransition: 4 }],
       currentBeat: 0,
       beatsToDisplay: 0,
       metronomeViewBeats: [],
@@ -36,17 +36,17 @@ class Home extends Component {
   addDropdown = () => {
     const newId = this.state.dropdowns.length + 1;
     this.setState(prevState => ({
-      dropdowns: [...prevState.dropdowns, { id: newId, timeSignature: '2-4', bpm: null, parts: null, transition: null }]
+      dropdowns: [...prevState.dropdowns, { id: newId, timeSignature: '2-4', bpm: null, parts: null, preTransition: null, postTransition: null }]
     }));
   }
 
   loadMSR = () => {
     this.setState({
       dropdowns: [
-        { id: 1, timeSignature: 'rolls', bpm: null, parts: 1, transition: 4 },
-        { id: 2, timeSignature: '2-4', bpm: null, parts: null, transition: -1 },
-        { id: 3, timeSignature: '4str', bpm: null, parts: null, transition: 1 },
-        { id: 4, timeSignature: '2-2', bpm: null, parts: null, transition: 2 }
+        { id: 1, timeSignature: 'rolls', bpm: null, parts: 1, preTransition: 0, postTransition: 4 },
+        { id: 2, timeSignature: '2-4', bpm: null, parts: null, preTransition: 0, postTransition: -1 },
+        { id: 3, timeSignature: '4str', bpm: null, parts: null, preTransition: 2, postTransition: -1 },
+        { id: 4, timeSignature: '2-2', bpm: null, parts: null, preTransition: 2, postTransition: 0 }
       ],
       startMetronome: false,
       notice: 'MSR loaded: March, Strathspey, Reel'
@@ -57,12 +57,12 @@ class Home extends Component {
   loadMedley = () => {
     this.setState({
       dropdowns: [
-        { id: 1, timeSignature: 'rolls', bpm: null, parts: 1, transition: 4 },
-        { id: 2, timeSignature: '2-4', bpm: null, parts: null, transition: -1 },
-        { id: 3, timeSignature: '6-8', bpm: null, parts: null, transition: 1 },
-        { id: 4, timeSignature: '4slow', bpm: null, parts: null, transition: 0 },
-        { id: 5, timeSignature: '4str', bpm: null, parts: null, transition: 3 },
-        { id: 6, timeSignature: '2-2', bpm: null, parts: null, transition: 2 }
+        { id: 1, timeSignature: 'rolls', bpm: null, parts: 1, preTransition: 0, postTransition: 4 },
+        { id: 2, timeSignature: '2-4', bpm: null, parts: null, preTransition: 0, postTransition: -1 },
+        { id: 3, timeSignature: '6-8', bpm: null, parts: null, preTransition: 2, postTransition: -1 },
+        { id: 4, timeSignature: '4slow', bpm: null, parts: null, preTransition: 4, postTransition: 0 },
+        { id: 5, timeSignature: '4str', bpm: null, parts: null, preTransition: 4, postTransition: -2 },
+        { id: 6, timeSignature: '2-2', bpm: null, parts: null, preTransition: 2, postTransition: 0 }
       ],
       startMetronome: false,
       notice: 'Medley loaded: Hornpipe, Jig, Slow Air, Strathspey, Reel'
@@ -71,7 +71,7 @@ class Home extends Component {
   }
 
   removeDropdown = (id) => {
-    // If metronome is running, kill playback first to avoid overlapping loops
+    // if metronome is running, kill playback first to avoid overlapping loops
     if (this.state.startMetronome) {
       this.setState({ startMetronome: false, notice: 'Playback stopped because a tune was removed.' }, () => {
         const updatedDropdowns = this.state.dropdowns.filter((dropdown) => dropdown.id !== id);
@@ -128,7 +128,7 @@ class Home extends Component {
             <div className="Dropdowns">
             {this.state.dropdowns.map((dropdown) => (
               <div key={dropdown.id} className="DropdownItem">
-                <div className="card" style={{display:'flex', gap:12, alignItems:'center', justifyContent:'space-between'}}>
+                <div className="card">
                   <select
                   value={dropdown.timeSignature}
                   onChange={(e) => this.handleDropdownChange(dropdown.id, 'timeSignature', e.target.value)}
@@ -164,18 +164,28 @@ class Home extends Component {
                       const val = parseInt(e.target.value);
                       this.handleDropdownChange(dropdown.id, 'parts', isNaN(val) ? null : val);
                     }}
-                    placeholder="Number Parts"
+                    placeholder="Parts"
                     className='text-box form-input'
                   />
                   <input
                     type="number"
-                    value={dropdown.transition || ''}
+                    value={dropdown.preTransition || ''}
                     onChange={(e) => {
                       const val = parseInt(e.target.value);
-                      this.handleDropdownChange(dropdown.id, 'transition', isNaN(val) ? null : val);
+                      this.handleDropdownChange(dropdown.id, 'preTransition', isNaN(val) ? null : val);
                     }}
-                    placeholder="Transition Beats"
-                    className='text-box form-input'
+                    placeholder="Pre Transition"
+                    className='text-box form-input small-input'
+                  />
+                  <input
+                    type="number"
+                    value={dropdown.postTransition || ''}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value);
+                      this.handleDropdownChange(dropdown.id, 'postTransition', isNaN(val) ? null : val);
+                    }}
+                    placeholder="Post Transition"
+                    className='text-box form-input small-input'
                   />
                 </div>
                 <button className="btn danger" onClick={() => this.removeDropdown(dropdown.id)}>Remove Tune</button>
@@ -183,7 +193,7 @@ class Home extends Component {
               </div>
             ))}
           </div>
-          <div style={{marginTop:12, display:'flex', gap:12, justifyContent:'center', alignItems:'center'}}>
+          <div className="button-group">
             <button className="btn ghost" onClick={this.addDropdown}>Add Tune</button>
             <button
               className="btn"
