@@ -1,14 +1,14 @@
 import { useEffect, useRef } from 'react';
 import usePlaySound from './playsound';
 
-const waitForBeat = (beatDuration, cancelledRef) => new Promise(resolve => {
+const waitForBeat = (beatDuration, isStaleRun) => new Promise(resolve => {
     const timeoutId = setTimeout(() => {
         clearInterval(pollId);
         resolve();
     }, beatDuration);
 
     const pollId = setInterval(() => {
-        if (cancelledRef.current) {
+        if (isStaleRun()) {
             clearTimeout(timeoutId);
             clearInterval(pollId);
             resolve();
@@ -49,6 +49,7 @@ const MetronomeLogic = ({ dropdowns, onBeatUpdate, onUpdateBeatsToDisplay, onTun
   const play = usePlaySound();
   const onStoppedRef = useRef(onStopped);
     const cancelledRef = useRef(false);
+        const activeRunIdRef = useRef(0);
 
     // Keep ref updated
     useEffect(() => {
@@ -56,11 +57,15 @@ const MetronomeLogic = ({ dropdowns, onBeatUpdate, onUpdateBeatsToDisplay, onTun
     }, [onStopped]);
 
     useEffect(() => {
+        const runId = activeRunIdRef.current + 1;
+        activeRunIdRef.current = runId;
         cancelledRef.current = false;
+
+        const isStaleRun = () => activeRunIdRef.current !== runId || cancelledRef.current;
 
         const playMetronome = async () => {
             for (let dropdown of dropdowns) {
-                if (cancelledRef.current) break;
+                if (isStaleRun()) break;
                 if (onTuneChange) {
                     onTuneChange(getTuneLabel(dropdown.timeSignature));
                 }
@@ -119,7 +124,7 @@ const MetronomeLogic = ({ dropdowns, onBeatUpdate, onUpdateBeatsToDisplay, onTun
 
                 // Play all beats: pre-transition + main tune + post-transition
                 for (let i = 0; i < totalLen; i++) {
-                    if (cancelledRef.current) break;
+                    if (isStaleRun()) break;
                     play();
                         
                     // Determine which phase we're in and update display accordingly
@@ -144,17 +149,22 @@ const MetronomeLogic = ({ dropdowns, onBeatUpdate, onUpdateBeatsToDisplay, onTun
                     }
 
                     // cancellable delay: wait for beatDuration but wake early if cancelled
-                    await waitForBeat(beatDuration, cancelledRef);
+                    await waitForBeat(beatDuration, isStaleRun);
                 }
             }
             // Playback finished naturally - call onStopped
-            if (!cancelledRef.current && onStoppedRef.current) {
+            if (!isStaleRun() && onStoppedRef.current) {
                 onStoppedRef.current();
             }
         };
 
         playMetronome();
-        return () => { cancelledRef.current = true; };
+        return () => {
+            cancelledRef.current = true;
+            if (activeRunIdRef.current === runId) {
+                activeRunIdRef.current += 1;
+            }
+        };
     }, [dropdowns, onBeatUpdate, onUpdateBeatsToDisplay, onTuneChange, play]);
 
   return null;
