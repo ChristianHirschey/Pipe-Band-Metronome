@@ -1,7 +1,20 @@
 import { useEffect, useRef } from 'react';
 import usePlaySound from './playsound';
 
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+const waitForBeat = (beatDuration, isCancelled) => new Promise(resolve => {
+    const timeoutId = setTimeout(() => {
+        clearInterval(pollId);
+        resolve();
+    }, beatDuration);
+
+    const pollId = setInterval(() => {
+        if (isCancelled()) {
+            clearTimeout(timeoutId);
+            clearInterval(pollId);
+            resolve();
+        }
+    }, 40);
+});
 
 const getTuneLabel = (timeSignature) => {
     switch (timeSignature) {
@@ -35,6 +48,7 @@ const getTuneLabel = (timeSignature) => {
 const MetronomeLogic = ({ dropdowns, onBeatUpdate, onUpdateBeatsToDisplay, onTuneChange, onStopped }) => {
   const play = usePlaySound();
   const onStoppedRef = useRef(onStopped);
+    const cancelledRef = useRef(false);
 
     // Keep ref updated
     useEffect(() => {
@@ -42,11 +56,11 @@ const MetronomeLogic = ({ dropdowns, onBeatUpdate, onUpdateBeatsToDisplay, onTun
     }, [onStopped]);
 
     useEffect(() => {
-        let cancelled = false;
+        cancelledRef.current = false;
 
         const playMetronome = async () => {
             for (let dropdown of dropdowns) {
-                if (cancelled) break;
+                if (cancelledRef.current) break;
                 if (onTuneChange) {
                     onTuneChange(getTuneLabel(dropdown.timeSignature));
                 }
@@ -105,7 +119,7 @@ const MetronomeLogic = ({ dropdowns, onBeatUpdate, onUpdateBeatsToDisplay, onTun
 
                 // Play all beats: pre-transition + main tune + post-transition
                 for (let i = 0; i < totalLen; i++) {
-                    if (cancelled) break;
+                    if (cancelledRef.current) break;
                     play();
                         
                     // Determine which phase we're in and update display accordingly
@@ -130,24 +144,18 @@ const MetronomeLogic = ({ dropdowns, onBeatUpdate, onUpdateBeatsToDisplay, onTun
                     }
 
                     // cancellable delay: wait for beatDuration but wake early if cancelled
-                    await Promise.race([
-                        delay(beatDuration),
-                        new Promise(res => {
-                            const check = () => cancelled ? res() : setTimeout(check, 40);
-                            check();
-                        })
-                    ]);
+                    await waitForBeat(beatDuration, cancelledRef);
                 }
             }
             // Playback finished naturally - call onStopped
-            if (!cancelled && onStoppedRef.current) {
+            if (!cancelledRef.current && onStoppedRef.current) {
                 onStoppedRef.current();
             }
         };
 
         playMetronome();
-        return () => { cancelled = true; };
-    }, [dropdowns, onBeatUpdate, onUpdateBeatsToDisplay, play]);
+        return () => { cancelledRef.current = true; };
+    }, [dropdowns, onBeatUpdate, onUpdateBeatsToDisplay, onTuneChange, play]);
 
   return null;
 };
