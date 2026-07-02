@@ -1,14 +1,14 @@
 import { useEffect, useRef } from 'react';
 import usePlaySound from './playsound';
 
-const waitForBeat = (beatDuration, isCancelled) => new Promise(resolve => {
+const waitForBeat = (beatDuration, cancelledRef) => new Promise(resolve => {
     const timeoutId = setTimeout(() => {
         clearInterval(pollId);
         resolve();
     }, beatDuration);
 
     const pollId = setInterval(() => {
-        if (isCancelled()) {
+        if (cancelledRef.current) {
             clearTimeout(timeoutId);
             clearInterval(pollId);
             resolve();

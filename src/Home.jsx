@@ -28,7 +28,7 @@ class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      dropdowns: [{ id: 1, timeSignature: 'rolls', bpm: null, parts: 1, preTransition: 0, postTransition: 4 }],
+      dropdowns: [{ id: 1, timeSignature: 'rolls', bpm: null, parts: 1, preTransition: 8, postTransition: 0 }],
       currentBeat: 0,
       beatsToDisplay: 0,
       currentTuneLabel: '',
