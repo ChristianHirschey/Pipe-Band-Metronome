@@ -5,6 +5,25 @@ import { Link } from 'react-router-dom';
 import calculateBeats from './calculateBeats';
 import RingerReminder from './RingerReminder';
 
+const PRESET_STORAGE_KEY = 'pipe-band-metronome-presets';
+
+const presetTemplates = {
+  msr: [
+    { id: 1, timeSignature: 'rolls', bpm: null, parts: 1, preTransition: 0, postTransition: 4 },
+    { id: 2, timeSignature: '2-4', bpm: null, parts: null, preTransition: 0, postTransition: -1 },
+    { id: 3, timeSignature: '4str', bpm: null, parts: null, preTransition: 2, postTransition: -1 },
+    { id: 4, timeSignature: '2-2', bpm: null, parts: null, preTransition: 2, postTransition: 0 }
+  ],
+  medley: [
+    { id: 1, timeSignature: 'rolls', bpm: null, parts: 1, preTransition: 0, postTransition: 4 },
+    { id: 2, timeSignature: '2-4', bpm: null, parts: null, preTransition: 0, postTransition: -1 },
+    { id: 3, timeSignature: '6-8', bpm: null, parts: null, preTransition: 2, postTransition: -1 },
+    { id: 4, timeSignature: '4slow', bpm: null, parts: null, preTransition: 4, postTransition: 0 },
+    { id: 5, timeSignature: '4str', bpm: null, parts: null, preTransition: 4, postTransition: -2 },
+    { id: 6, timeSignature: '2-2', bpm: null, parts: null, preTransition: 2, postTransition: 0 }
+  ]
+};
+
 class Home extends Component {
   constructor(props) {
     super(props);
@@ -12,8 +31,10 @@ class Home extends Component {
       dropdowns: [{ id: 1, timeSignature: 'rolls', bpm: null, parts: 1, preTransition: 0, postTransition: 4 }],
       currentBeat: 0,
       beatsToDisplay: 0,
+      currentTuneLabel: '',
       metronomeViewBeats: [],
       startMetronome: false,
+      activePreset: null,
       notice: null
     };
   }
@@ -33,6 +54,43 @@ class Home extends Component {
     this.setState({ metronomeViewBeats: beats });
   }
 
+  readSavedPresets = () => {
+    try {
+      const raw = localStorage.getItem(PRESET_STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (error) {
+      return {};
+    }
+  }
+
+  savePreset = (presetName, dropdowns) => {
+    try {
+      const savedPresets = this.readSavedPresets();
+      savedPresets[presetName] = dropdowns.map((dropdown) => ({
+        bpm: dropdown.bpm,
+        parts: dropdown.parts
+      }));
+      localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify(savedPresets));
+    } catch (error) {
+      // Ignore storage failures so the app still works without persistence.
+    }
+  }
+
+  applySavedPreset = (presetName) => {
+    const template = presetTemplates[presetName];
+    const savedPresets = this.readSavedPresets();
+    const savedDropdowns = savedPresets[presetName] || [];
+
+    return template.map((dropdown, index) => {
+      const saved = savedDropdowns[index] || {};
+      return {
+        ...dropdown,
+        bpm: saved.bpm ?? dropdown.bpm,
+        parts: saved.parts ?? dropdown.parts
+      };
+    });
+  }
+
   addDropdown = () => {
     const newId = this.state.dropdowns.length + 1;
     this.setState(prevState => ({
@@ -42,13 +100,9 @@ class Home extends Component {
 
   loadMSR = () => {
     this.setState({
-      dropdowns: [
-        { id: 1, timeSignature: 'rolls', bpm: null, parts: 1, preTransition: 0, postTransition: 4 },
-        { id: 2, timeSignature: '2-4', bpm: null, parts: null, preTransition: 0, postTransition: -1 },
-        { id: 3, timeSignature: '4str', bpm: null, parts: null, preTransition: 2, postTransition: -1 },
-        { id: 4, timeSignature: '2-2', bpm: null, parts: null, preTransition: 2, postTransition: 0 }
-      ],
+      dropdowns: this.applySavedPreset('msr'),
       startMetronome: false,
+      activePreset: 'msr',
       notice: 'MSR loaded: March, Strathspey, Reel'
     });
     setTimeout(() => this.setState({ notice: null }), 2200);
@@ -56,15 +110,9 @@ class Home extends Component {
 
   loadMedley = () => {
     this.setState({
-      dropdowns: [
-        { id: 1, timeSignature: 'rolls', bpm: null, parts: 1, preTransition: 0, postTransition: 4 },
-        { id: 2, timeSignature: '2-4', bpm: null, parts: null, preTransition: 0, postTransition: -1 },
-        { id: 3, timeSignature: '6-8', bpm: null, parts: null, preTransition: 2, postTransition: -1 },
-        { id: 4, timeSignature: '4slow', bpm: null, parts: null, preTransition: 4, postTransition: 0 },
-        { id: 5, timeSignature: '4str', bpm: null, parts: null, preTransition: 4, postTransition: -2 },
-        { id: 6, timeSignature: '2-2', bpm: null, parts: null, preTransition: 2, postTransition: 0 }
-      ],
+      dropdowns: this.applySavedPreset('medley'),
       startMetronome: false,
+      activePreset: 'medley',
       notice: 'Medley loaded: Hornpipe, Jig, Slow Air, Strathspey, Reel'
     });
     setTimeout(() => this.setState({ notice: null }), 2200);
@@ -86,9 +134,14 @@ class Home extends Component {
   }
 
   handleDropdownChange = (id, field, value) => {
-    this.setState(prevState => ({
-      dropdowns: prevState.dropdowns.map(item => item.id === id ? { ...item, [field]: value } : item)
-    }));
+    this.setState(prevState => {
+      const dropdowns = prevState.dropdowns.map(item => item.id === id ? { ...item, [field]: value } : item);
+      return { dropdowns };
+    }, () => {
+      if (this.state.activePreset && (field === 'bpm' || field === 'parts')) {
+        this.savePreset(this.state.activePreset, this.state.dropdowns);
+      }
+    });
   }
 
   setCurrentBeat = (beat) => {
@@ -97,6 +150,47 @@ class Home extends Component {
 
   updateBeatsToDisplay = (beats) => {
     this.setState({ beatsToDisplay: beats });
+  }
+
+  updateCurrentTuneLabel = (label) => {
+    this.setState({ currentTuneLabel: label || '' });
+  }
+
+  startPlayback = () => {
+    // Validate that each dropdown has required values before playing
+    const invalid = this.state.dropdowns.some(d => !d.bpm || !d.parts || d.bpm <= 0 || d.parts <= 0);
+    if (invalid) {
+      this.setState({ notice: 'Please set BPM and Parts for each tune before playing.' });
+      setTimeout(() => this.setState({ notice: null }), 2200);
+      return;
+    }
+
+    this.setState({
+      currentBeat: 0,
+      beatsToDisplay: 0,
+      currentTuneLabel: '',
+      startMetronome: true,
+      notice: null
+    });
+  }
+
+  stopPlayback = () => {
+    this.setState({
+      currentBeat: 0,
+      beatsToDisplay: 0,
+      currentTuneLabel: '',
+      startMetronome: false,
+      notice: null
+    });
+  }
+
+  handlePlaybackToggle = () => {
+    if (this.state.startMetronome) {
+      this.stopPlayback();
+      return;
+    }
+
+    this.startPlayback();
   }
 
   renderGridBoxes = () => {
@@ -123,6 +217,9 @@ class Home extends Component {
             <div className="metronome-card card">
               <div className="MetronomeView metronome-grid">
                 {this.renderGridBoxes()}
+              </div>
+              <div className="current-tune-box" aria-live="polite" aria-atomic="true">
+                {this.state.currentTuneLabel}
               </div>
             </div>
             <div className="Dropdowns">
@@ -196,19 +293,9 @@ class Home extends Component {
           <div className="button-group">
             <button className="btn ghost" onClick={this.addDropdown}>Add Tune</button>
             <button
-              className="btn"
-              onClick={() => {
-                // Validate that each dropdown has required values before playing
-                const invalid = this.state.dropdowns.some(d => !d.bpm || !d.parts || d.bpm <= 0 || d.parts <= 0);
-                if (invalid) {
-                  this.setState({ notice: 'Please set BPM and Parts for each tune before playing.' });
-                  setTimeout(() => this.setState({ notice: null }), 2200);
-                  return;
-                }
-                // start playback; ensure any previous playback was stopped (MetronomeLogic will cancel on prop change)
-                this.setState({ startMetronome: true, notice: null });
-              }}
-            >Play</button>
+              className={this.state.startMetronome ? 'btn danger' : 'btn'}
+              onClick={this.handlePlaybackToggle}
+            >{this.state.startMetronome ? 'Stop' : 'Start'}</button>
           </div>
           {this.state.notice && (
             <div style={{textAlign:'center', marginTop:12}} className="muted">{this.state.notice}</div>
@@ -218,7 +305,14 @@ class Home extends Component {
               dropdowns={this.state.dropdowns}
               onBeatUpdate={this.setCurrentBeat}
               onUpdateBeatsToDisplay={this.updateBeatsToDisplay}
-              onStopped={() => this.setState({ startMetronome: false, notice: 'Playback finished.' })}
+              onTuneChange={this.updateCurrentTuneLabel}
+              onStopped={() => this.setState({
+                startMetronome: false,
+                currentBeat: 0,
+                beatsToDisplay: 0,
+                currentTuneLabel: '',
+                notice: 'Playback finished.'
+              })}
             />
           )}
         </main>

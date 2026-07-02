@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(42, 92, 122, 0.38);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -29,6 +29,7 @@
   padding: 28px 24px;
   max-width: 380px;
   width: 100%;
+  border: 1px solid var(--card-border);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   text-align: center;
   animation: slideUp 0.3s ease;

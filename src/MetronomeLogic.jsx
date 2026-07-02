@@ -3,7 +3,36 @@ import usePlaySound from './playsound';
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-const MetronomeLogic = ({ dropdowns, onBeatUpdate, onUpdateBeatsToDisplay, onStopped }) => {
+const getTuneLabel = (timeSignature) => {
+    switch (timeSignature) {
+        case 'rolls':
+            return 'Attack Rolls';
+        case '2-4':
+            return '2/4 (March, Hornpipe)';
+        case '3-4':
+            return '3/4 (March)';
+        case '4-4':
+            return '4/4 (March)';
+        case '6-8':
+            return '6/8 Jig';
+        case '9-8':
+            return '9/8 Jig';
+        case '3slow':
+            return '3/4 Slow Air';
+        case '4slow':
+            return '4/4 Slow Air';
+        case '4str':
+            return '4/4 Strathspey';
+        case '2-2':
+            return '2/2 Reel';
+        case '3-2':
+            return '3/2 Reel';
+        default:
+            return timeSignature || '';
+    }
+};
+
+const MetronomeLogic = ({ dropdowns, onBeatUpdate, onUpdateBeatsToDisplay, onTuneChange, onStopped }) => {
   const play = usePlaySound();
   const onStoppedRef = useRef(onStopped);
 
@@ -18,6 +47,9 @@ const MetronomeLogic = ({ dropdowns, onBeatUpdate, onUpdateBeatsToDisplay, onSto
         const playMetronome = async () => {
             for (let dropdown of dropdowns) {
                 if (cancelled) break;
+                if (onTuneChange) {
+                    onTuneChange(getTuneLabel(dropdown.timeSignature));
+                }
                 let mainLen;
                 let preTrans = dropdown.preTransition || 0;
                 let postTrans = dropdown.postTransition || 0;
