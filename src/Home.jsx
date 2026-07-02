@@ -9,13 +9,13 @@ const PRESET_STORAGE_KEY = 'pipe-band-metronome-presets';
 
 const presetTemplates = {
   msr: [
-    { id: 1, timeSignature: 'rolls', bpm: null, parts: 1, preTransition: 0, postTransition: 4 },
+    { id: 1, timeSignature: 'rolls', bpm: null, parts: 1, preTransition: 8, postTransition: 0 },
     { id: 2, timeSignature: '2-4', bpm: null, parts: null, preTransition: 0, postTransition: -1 },
     { id: 3, timeSignature: '4str', bpm: null, parts: null, preTransition: 2, postTransition: -1 },
     { id: 4, timeSignature: '2-2', bpm: null, parts: null, preTransition: 2, postTransition: 0 }
   ],
   medley: [
-    { id: 1, timeSignature: 'rolls', bpm: null, parts: 1, preTransition: 0, postTransition: 4 },
+    { id: 1, timeSignature: 'rolls', bpm: null, parts: 1, preTransition: 8, postTransition: 0 },
     { id: 2, timeSignature: '2-4', bpm: null, parts: null, preTransition: 0, postTransition: -1 },
     { id: 3, timeSignature: '6-8', bpm: null, parts: null, preTransition: 2, postTransition: -1 },
     { id: 4, timeSignature: '4slow', bpm: null, parts: null, preTransition: 4, postTransition: 0 },
