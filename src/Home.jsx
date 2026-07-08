@@ -7,6 +7,11 @@ import RingerReminder from './RingerReminder';
 
 const PRESET_STORAGE_KEY = 'pipe-band-metronome-presets';
 
+const presetSlots = {
+  msr: [1, 2],
+  medley: [1, 2]
+};
+
 const presetTemplates = {
   msr: [
     { id: 1, timeSignature: 'rolls', bpm: null, parts: 1, preTransition: 8, postTransition: 0 },
@@ -34,7 +39,8 @@ class Home extends Component {
       currentTuneLabel: '',
       metronomeViewBeats: [],
       startMetronome: false,
-      activePreset: null,
+      activePresetType: null,
+      activePresetSlot: null,
       notice: null
     };
   }
@@ -54,6 +60,20 @@ class Home extends Component {
     this.setState({ metronomeViewBeats: beats });
   }
 
+  clonePresetTemplate = (presetName) => {
+    const template = presetTemplates[presetName] || [];
+    return template.map((dropdown) => ({ ...dropdown }));
+  }
+
+  normalizeDropdown = (dropdown, fallback = {}) => ({
+    id: dropdown.id ?? fallback.id,
+    timeSignature: dropdown.timeSignature ?? fallback.timeSignature ?? '2-4',
+    bpm: dropdown.bpm ?? null,
+    parts: dropdown.parts ?? null,
+    preTransition: dropdown.preTransition ?? null,
+    postTransition: dropdown.postTransition ?? null
+  })
+
   readSavedPresets = () => {
     try {
       const raw = localStorage.getItem(PRESET_STORAGE_KEY);
@@ -63,59 +83,72 @@ class Home extends Component {
     }
   }
 
-  savePreset = (presetName, dropdowns) => {
+  savePreset = (presetName, slot, dropdowns) => {
     try {
       const savedPresets = this.readSavedPresets();
-      savedPresets[presetName] = dropdowns.map((dropdown) => ({
+      const presetNameStorage = savedPresets[presetName] || {};
+      presetNameStorage[slot] = dropdowns.map((dropdown) => ({
+        id: dropdown.id,
+        timeSignature: dropdown.timeSignature,
         bpm: dropdown.bpm,
-        parts: dropdown.parts
+        parts: dropdown.parts,
+        preTransition: dropdown.preTransition,
+        postTransition: dropdown.postTransition
       }));
+      savedPresets[presetName] = presetNameStorage;
       localStorage.setItem(PRESET_STORAGE_KEY, JSON.stringify(savedPresets));
     } catch (error) {
       // Ignore storage failures so the app still works without persistence.
     }
   }
 
-  applySavedPreset = (presetName) => {
-    const template = presetTemplates[presetName];
+  applySavedPreset = (presetName, slot) => {
+    const template = this.clonePresetTemplate(presetName);
     const savedPresets = this.readSavedPresets();
-    const savedDropdowns = savedPresets[presetName] || [];
+    const savedDropdowns = (savedPresets[presetName] && savedPresets[presetName][slot]) || [];
 
-    return template.map((dropdown, index) => {
-      const saved = savedDropdowns[index] || {};
-      return {
-        ...dropdown,
-        bpm: saved.bpm ?? dropdown.bpm,
-        parts: saved.parts ?? dropdown.parts
-      };
-    });
+    if (!savedDropdowns.length) {
+      return template;
+    }
+
+    return savedDropdowns.map((dropdown, index) => this.normalizeDropdown(dropdown, template[index] || dropdown));
   }
 
   addDropdown = () => {
-    const newId = this.state.dropdowns.length + 1;
+    const newId = this.state.dropdowns.reduce((highestId, dropdown) => Math.max(highestId, dropdown.id), 0) + 1;
     this.setState(prevState => ({
       dropdowns: [...prevState.dropdowns, { id: newId, timeSignature: '2-4', bpm: null, parts: null, preTransition: null, postTransition: null }]
-    }));
+    }), () => {
+      if (this.state.activePresetType && this.state.activePresetSlot) {
+        this.savePreset(this.state.activePresetType, this.state.activePresetSlot, this.state.dropdowns);
+      }
+    });
   }
 
-  loadMSR = () => {
+  loadPreset = (presetName, slot) => {
+    const dropdowns = this.applySavedPreset(presetName, slot);
+    const notice = presetName === 'msr'
+      ? `MSR ${slot} loaded: March, Strathspey, Reel`
+      : `Medley ${slot} loaded: Hornpipe, Jig, Slow Air, Strathspey, Reel`;
+
     this.setState({
-      dropdowns: this.applySavedPreset('msr'),
+      dropdowns,
       startMetronome: false,
-      activePreset: 'msr',
-      notice: 'MSR loaded: March, Strathspey, Reel'
+      activePresetType: presetName,
+      activePresetSlot: slot,
+      notice
+    }, () => {
+      this.savePreset(presetName, slot, this.state.dropdowns);
     });
     setTimeout(() => this.setState({ notice: null }), 2200);
   }
 
-  loadMedley = () => {
-    this.setState({
-      dropdowns: this.applySavedPreset('medley'),
-      startMetronome: false,
-      activePreset: 'medley',
-      notice: 'Medley loaded: Hornpipe, Jig, Slow Air, Strathspey, Reel'
-    });
-    setTimeout(() => this.setState({ notice: null }), 2200);
+  loadMSR = (slot) => {
+    this.loadPreset('msr', slot);
+  }
+
+  loadMedley = (slot) => {
+    this.loadPreset('medley', slot);
   }
 
   removeDropdown = (id) => {
@@ -123,13 +156,21 @@ class Home extends Component {
     if (this.state.startMetronome) {
       this.setState({ startMetronome: false, notice: 'Playback stopped because a tune was removed.' }, () => {
         const updatedDropdowns = this.state.dropdowns.filter((dropdown) => dropdown.id !== id);
-        this.setState({ dropdowns: updatedDropdowns });
+        this.setState({ dropdowns: updatedDropdowns }, () => {
+          if (this.state.activePresetType && this.state.activePresetSlot) {
+            this.savePreset(this.state.activePresetType, this.state.activePresetSlot, this.state.dropdowns);
+          }
+        });
         // clear notice after a short delay
         setTimeout(() => this.setState({ notice: null }), 2200);
       });
     } else {
       const updatedDropdowns = this.state.dropdowns.filter((dropdown) => dropdown.id !== id);
-      this.setState({ dropdowns: updatedDropdowns });
+      this.setState({ dropdowns: updatedDropdowns }, () => {
+        if (this.state.activePresetType && this.state.activePresetSlot) {
+          this.savePreset(this.state.activePresetType, this.state.activePresetSlot, this.state.dropdowns);
+        }
+      });
     }
   }
 
@@ -138,8 +179,8 @@ class Home extends Component {
       const dropdowns = prevState.dropdowns.map(item => item.id === id ? { ...item, [field]: value } : item);
       return { dropdowns };
     }, () => {
-      if (this.state.activePreset && (field === 'bpm' || field === 'parts')) {
-        this.savePreset(this.state.activePreset, this.state.dropdowns);
+      if (this.state.activePresetType && this.state.activePresetSlot) {
+        this.savePreset(this.state.activePresetType, this.state.activePresetSlot, this.state.dropdowns);
       }
     });
   }
@@ -204,6 +245,10 @@ class Home extends Component {
   }
 
   render() {
+    const activePresetKey = this.state.activePresetType && this.state.activePresetSlot
+      ? `${this.state.activePresetType}-${this.state.activePresetSlot}`
+      : null;
+
     return (
       <div className="Home">
         <RingerReminder />
@@ -319,9 +364,21 @@ class Home extends Component {
           <div className="Footer">
             <footer>
               <div className="Links">
-                <button onClick={this.loadMSR} className="btn ghost small">MSR</button>
+                {presetSlots.msr.map((slot) => (
+                  <button
+                    key={`msr-${slot}`}
+                    onClick={() => this.loadMSR(slot)}
+                    className={`btn ghost small ${activePresetKey === `msr-${slot}` ? 'active' : ''}`}
+                  >MSR {slot}</button>
+                ))}
                 <Link to="/about" className="btn ghost small">About</Link>
-                <button onClick={this.loadMedley} className="btn ghost small">Medley</button>
+                {presetSlots.medley.map((slot) => (
+                  <button
+                    key={`medley-${slot}`}
+                    onClick={() => this.loadMedley(slot)}
+                    className={`btn ghost small ${activePresetKey === `medley-${slot}` ? 'active' : ''}`}
+                  >Medley {slot}</button>
+                ))}
               </div>
             </footer>
           </div>

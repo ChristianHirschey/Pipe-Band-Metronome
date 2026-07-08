@@ -53,7 +53,25 @@
     border-radius: 8px; 
     border: 1px solid var(--input-border); 
     background: var(--glass); 
-    color: var(--primary) 
+    color: var(--primary);
+    color-scheme: light;
+}
+
+.dark .select {
+    background: rgba(255, 255, 255, 0.08);
+    color: #f0f8fc;
+    border-color: rgba(181, 219, 237, 0.28);
+    color-scheme: dark;
+}
+
+.select option {
+    background: var(--bg);
+    color: var(--primary);
+}
+
+.dark .select option {
+    background: #1a3445;
+    color: #f0f8fc;
 }
 
 .text-boxes { 
