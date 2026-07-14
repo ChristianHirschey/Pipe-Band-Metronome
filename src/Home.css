@@ -18,7 +18,8 @@
     flex-direction: column;
     gap: 16px;
     align-items: center;
-    width: fit-content;
+    width: clamp(200px, 80vw, 390px);
+    max-width: 100%;
     margin: 0 auto;
 }
 
@@ -116,13 +117,16 @@
 
 .MetronomeView { 
     margin-top: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
 .current-tune-box {
     margin-top: 14px;
     min-height: 42px;
     width: 100%;
-    max-width: 420px;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -148,7 +152,8 @@
     gap: 8px;
     justify-content: center; 
     flex-wrap: wrap;
-    min-width: 280px;
+    width: 100%;
+    min-width: 0;
     margin: 0 auto;
 }
 
@@ -186,7 +191,7 @@
     .select {
         width: 100%;
         min-width: unset;
-        font-size: 16px; /* Prevents zoom on iOS */
+        font-size: 16px;
     }
 
     .text-boxes {
@@ -198,7 +203,7 @@
     .text-box {
         width: 100%;
         max-width: unset;
-        font-size: 16px; /* Prevents zoom on iOS */
+        font-size: 16px;
     }
 
     .text-box.small-input {
@@ -215,8 +220,13 @@
         height: 24px;
     }
 
-    .current-tune-box {
+    .metronome-card {
+        width: clamp(200px, 80vw, 390px);
         max-width: 100%;
+    }
+
+    .current-tune-box {
+        width: 100%;
         min-height: 40px;
         font-size: 14px;
     }

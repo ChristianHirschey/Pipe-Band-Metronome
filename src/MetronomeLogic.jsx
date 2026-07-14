@@ -16,33 +16,47 @@ const waitForBeat = (beatDuration, isStaleRun) => new Promise(resolve => {
     }, 40);
 });
 
-const getTuneLabel = (timeSignature) => {
+const getTuneInfo = (timeSignature) => {
     switch (timeSignature) {
         case 'rolls':
-            return 'Attack Rolls';
+            return { label: 'Attack Rolls', beatsPerPart: 8 };
         case '2-4':
-            return '2/4 (March, Hornpipe)';
+            return { label: '2/4 March', beatsPerPart: 32 };
         case '3-4':
-            return '3/4 (March)';
+            return { label: '3/4 March', beatsPerPart: 48 };
         case '4-4':
-            return '4/4 (March)';
+            return { label: '4/4 March', beatsPerPart: 32 };
         case '6-8':
-            return '6/8 Jig';
+            return { label: '6/8 Jig', beatsPerPart: 32 };
         case '9-8':
-            return '9/8 Jig';
+            return { label: '9/8 Jig', beatsPerPart: 48 };
         case '3slow':
-            return '3/4 Slow Air';
+            return { label: '3/4 Slow Air', beatsPerPart: 24 };
         case '4slow':
-            return '4/4 Slow Air';
+            return { label: '4/4 Slow Air', beatsPerPart: 32 };
         case '4str':
-            return '4/4 Strathspey';
+            return { label: '4/4 Strathspey', beatsPerPart: 32 };
         case '2-2':
-            return '2/2 Reel';
+            return { label: '2/2 Reel', beatsPerPart: 16 };
         case '3-2':
-            return '3/2 Reel';
+            return { label: '3/2 Reel', beatsPerPart: 24 };
         default:
-            return timeSignature || '';
+            return { label: timeSignature || '', beatsPerPart: null };
     }
+};
+
+const formatTuneLabel = (timeSignature, partNumber = null) => {
+    const { label } = getTuneInfo(timeSignature);
+
+    if (!label) {
+        return '';
+    }
+
+    if (partNumber) {
+        return `${label} | Part ${partNumber}`;
+    }
+
+    return label;
 };
 
 const MetronomeLogic = ({ dropdowns, onBeatUpdate, onUpdateBeatsToDisplay, onTuneChange, onStopped }) => {
@@ -66,9 +80,7 @@ const MetronomeLogic = ({ dropdowns, onBeatUpdate, onUpdateBeatsToDisplay, onTun
         const playMetronome = async () => {
             for (let dropdown of dropdowns) {
                 if (isStaleRun()) break;
-                if (onTuneChange) {
-                    onTuneChange(getTuneLabel(dropdown.timeSignature));
-                }
+                const tuneInfo = getTuneInfo(dropdown.timeSignature);
                 let mainLen;
                 let preTrans = dropdown.preTransition || 0;
                 let postTrans = dropdown.postTransition || 0;
@@ -126,6 +138,15 @@ const MetronomeLogic = ({ dropdowns, onBeatUpdate, onUpdateBeatsToDisplay, onTun
                 for (let i = 0; i < totalLen; i++) {
                     if (isStaleRun()) break;
                     play();
+
+                    if (onTuneChange) {
+                        if (i >= preTrans && i < preTrans + mainLen && tuneInfo.beatsPerPart) {
+                            const currentPart = Math.floor((i - preTrans) / tuneInfo.beatsPerPart) + 1;
+                            onTuneChange(formatTuneLabel(dropdown.timeSignature, currentPart));
+                        } else {
+                            onTuneChange(formatTuneLabel(dropdown.timeSignature));
+                        }
+                    }
                         
                     // Determine which phase we're in and update display accordingly
                     if (i < preTrans) {
